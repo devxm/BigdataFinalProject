@@ -1,8 +1,11 @@
+#Reading Files from local
 >>> df2016 = spark.read.csv("/mnt/c/Users/sagar/Desktop/Temp/nyc-parking-tickets/Yearly/Parking_Violations_Issued_-_Fiscal_Year_2016.csv", inferSchema=True, header=True)
 >>> df2017 = spark.read.csv("/mnt/c/Users/sagar/Desktop/Temp/nyc-parking-tickets/Yearly/Parking_Violations_Issued_-_Fiscal_Year_2017.csv", inferSchema=True, header=True)
 >>> df2018 = spark.read.csv("/mnt/c/Users/sagar/Desktop/Temp/nyc-parking-tickets/Yearly/Parking_Violations_Issued_-_Fiscal_Year_2018.csv", inferSchema=True, header=True)
+#Performing union on the three files
 >>> dfFull = df2016.union(df2017)
 >>> dfFull = dfFull.union(df2018)
+#Performing sampling on the merged data
 >>> dfFull = dfFull.sample(False,0.1,0)
 >>> dfFull.count()
 >>> dfFull.repartition(1).write.csv(path="/mnt/c/Users/sagar/Desktop/Temp/nyc-parking-tickets
