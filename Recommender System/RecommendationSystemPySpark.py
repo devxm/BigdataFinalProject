@@ -46,6 +46,8 @@ dfTest = spark.read.csv(path+"Yearly/Parking_Violations_Issued_-_Fiscal_Year_201
 #Selecting only the 'Street Name' and 'Violation Code' columns as User, Item parameters and count of the violations as Rating for IBCF Recommnder System
 dfTrain = dfTrain.groupby('Street Name','Violation Code').count() 
 dfTest = dfTest.groupby('Street Name','Violation Code').count()
+#dfTrain.show()
+#dfTest.show()
 
 #Removing the space in the column names by renaming them to 'StreetName' & 'ViolationCode'
 dfTrain = dfTrain.withColumnRenamed('Street Name','StreetName').withColumnRenamed('Violation Code','ViolationCode')
@@ -91,14 +93,7 @@ recommModel = als.fit(dfTrain)
 predictions = recommModel.transform(dfTest)
 evaluator = RegressionEvaluator(metricName = "rmse", labelCol="count", predictionCol="prediction")
 RMSE = evaluator.evaluate(predictions)
-print("RMSE of Model:",RMSE)	#Observed value: 0.44057324770617523
-
-#Another way of making sure that the model is good, we can evaluate the model by computing the RMSE on train data
-#If RMSE_Train ~> RMSE_Test => Underfitting. If RMSE_Train ~< RMSE_Test => Overfitting. If RMSE_Train ~ RMSE_Test => Good Model
-predictionsTrain = recommModel.transform(dfTrain)
-evaluatorTrain = RegressionEvaluator(metricName = "rmse", labelCol="count", predictionCol="prediction")
-RMSETrain = evaluatorTrain.evaluate(predictionsTrain)
-RMSETrain
+print("RMSE of Test:",RMSE)	#Observed value: 0.44057324770617523
 
 #Let's now predict the possible Violation codes for 10 users using the model built
 streetWithPossibleViolations = recommModel.recommendForAllUsers(10)
@@ -124,14 +119,14 @@ def violationsForStreet(streetName):
 		
 #Now, let's find the possible violation codes that one can be ticketed for when parked on the top 10 streets
 streetName = "Broadway"
-print("Possible Violations for "+streetName+" are: "+violationsForStreet(streetName))
+print("Possible Violations for ",streetName," are: ",violationsForStreet(streetName))
 #########################################################################################
 #Sample output:																			#
 #('Possible Violations for ', 'Broadway', ' are: ', ['EXPIRED METER-COMM #METER ZONE',	#
 #'BEYOND MARKED SPACE', 'PCKP DSCHRGE IN PRHBTD ZONE','OBSTRUCTING						#
 #TRAFFIC/INTERSECT', 'ANGLE PARKING-COMM VEHICLE', 'FAIL TO #DISP. MUNI METER RECPT',	#
 #'NO STOPPING-DAY/TIME LIMITS', 'SELLING/OFFERIN # #MCHNDSE-METER', 'IDLING',			#
-#'NO PARKING-EXC. AUTH. VEHICLE'])                                                      #											#																			            #
+#'NO PARKING-EXC. AUTH. VEHICLE'])														#																			#
 #########################################################################################
 
 
